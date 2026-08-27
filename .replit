@@ -1,0 +1,57 @@
+modules = ["nodejs-24", "python-3.11"]
+
+[[artifacts]]
+id = "artifacts/api-server"
+
+[[artifacts]]
+id = "artifacts/mockup-sandbox"
+
+[deployment]
+router = "application"
+deploymentTarget = "autoscale"
+
+[deployment.postBuild]
+args = ["pnpm", "store", "prune"]
+env = { "CI" = "true" }
+
+[workflows]
+runButton = "Project"
+
+[[workflows.workflow]]
+name = "Project"
+mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Polymarket Bot"
+
+[[workflows.workflow]]
+name = "Polymarket Bot"
+author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python3 sharpflow.py"
+
+[agent]
+stack = "PNPM_WORKSPACE"
+expertMode = true
+
+[postMerge]
+path = "scripts/post-merge.sh"
+timeoutMs = 20000
+
+[userenv]
+
+[userenv.shared]
+TELEGRAM_CHAT_ID = "867434065"
+BOT_SCAN_INTERVAL = "300"
+VOLUME_SPIKE_THRESHOLD = "2.5"
+COOLDOWN_MINUTES = "45"
+
+[nix]
+channel = "stable-25_05"
